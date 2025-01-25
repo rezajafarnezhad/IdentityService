@@ -28,18 +28,53 @@ builder.Services.AddIdentityServer()
             AllowedGrantTypes =[GrantType.ClientCredentials],
             AllowedScopes = ["orderService.FullAccess"]
 
+        },
+        new Client()
+        {
+            ClientName = "FrontEnd web Code",
+            ClientId = "frontendwebcode",
+            ClientSecrets = {new Secret("123456".Sha256())},
+            AllowedGrantTypes =[GrantType.AuthorizationCode],
+            RedirectUris ={"https://localhost:7242/signin-oidc"},
+            PostLogoutRedirectUris = {"https://localhost:7242/signout-callback-oidc"},
+            AllowedScopes = {"openid", "profile", "orderService.GetOrder", "basketService.FullAccess", "apigatewayforweb.FullAccess" }
+        },
+        new Client()
+        {
+            ClientName = "Admin web Code",
+            ClientId = "Adminfrontendwebcode",
+            ClientSecrets = {new Secret("123456".Sha256())},
+            AllowedGrantTypes =[GrantType.AuthorizationCode],
+            RedirectUris ={"https://localhost:7242/signin-oidc"},
+            PostLogoutRedirectUris = {"https://localhost:7242/signout-callback-oidc"},
+            AllowedScopes = {"openid", "profile", "orderService.GetOrder", "basketService.FullAccess" }
         }
     })
-    .AddInMemoryIdentityResources(new List<IdentityResource>())
+    .AddInMemoryIdentityResources(new List<IdentityResource>()
+    {
+        new IdentityResources.OpenId(),
+        new IdentityResources.Profile()
+    })
     .AddInMemoryApiScopes(new List<ApiScope>()
     {
-        new ApiScope("orderService.FullAccess")
+        new ApiScope("orderService.Management"),
+        new ApiScope("orderService.GetOrder"),
+        new ApiScope("basketService.FullAccess"),
+        new ApiScope("apigatewayforweb.FullAccess"),
     })
     .AddInMemoryApiResources(new List<ApiResource>()
     {
         new ApiResource("orderService","orderServiceApi")
         {
-            Scopes ={ "orderService.FullAccess" }
+            Scopes ={ "orderService.Management", "orderService.GetOrder" }
+        },
+        new ApiResource("basketService","basketServiceApi")
+        {
+            Scopes ={ "basketService.FullAccess" }
+        },
+        new ApiResource("apigatewayforweb","apigatewayforwebServiceApi")
+        {
+            Scopes ={ "apigatewayforweb.FullAccess" }
         }
     })
 
